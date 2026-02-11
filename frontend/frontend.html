@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Management</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; line-height: 1.6; }
+        .container { max-width: 800px; margin: auto; }
+        .section { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 8px; }
+        button { background: #007bff; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        input { padding: 8px; width: 60px; }
+        pre { background: #f4f4f4; padding: 10px; border-radius: 4px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Employee Portal</h2>
+    <div class="section">
+        <h3>All Employees</h3>
+        <button onclick="fetchAllEmployees()">Load All Records</button>
+        <div id="all-employees-result">
+            <pre>Results will appear here...</pre>
+        </div>
+    </div>
+    <div class="section">
+        <h3>Find Employee by ID</h3>
+        <input type="number" id="empId" placeholder="ID" value="1">
+        <button onclick="fetchOneEmployee()">Search</button>
+        <div id="single-employee-result">
+            <pre>Result will appear here...</pre>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Configuration: Change this if your Django server runs on a different port
+    const BASE_URL = 'http://127.0.0.1:8000/api/employees/';
+
+    // Function to fetch all employees
+    async function fetchAllEmployees() {
+        const display = document.querySelector('#all-employees-result pre');
+        try {
+            const response = await fetch(BASE_URL);
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            display.textContent = JSON.stringify(data, null, 4);
+        } catch (error) {
+            display.textContent = 'Error: ' + error.message;
+        }
+    }
+
+    // Function to fetch one employee by ID
+    async function fetchOneEmployee() {
+        const id = document.getElementById('empId').value;
+        const display = document.querySelector('#single-employee-result pre');
+        
+        if (!id) {
+            alert("Please enter an ID");
+            return;
+        }
+
+        try {
+            const response = await fetch(`${BASE_URL}${id}/`);
+            if (!response.ok) throw new Error('Employee not found or Server error');
+            const data = await response.json();
+            display.textContent = JSON.stringify(data, null, 4);
+        } catch (error) {
+            display.textContent = 'Error: ' + error.message;
+        }
+    }
+</script>
+</body>
+</html>
